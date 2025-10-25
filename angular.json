@@ -25,7 +25,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "D:/vartotojo_sasajos/angular/minicrm/node_modules/bootstrap/dist/css/bootstrap.css"
             ]
           },
           "configurations": {
@@ -88,5 +89,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "6db99ec4-ff63-452f-be93-9d657ad32e0d"
   }
 }
