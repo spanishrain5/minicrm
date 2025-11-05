@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Form, FormArray, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { CompaniesService } from '../../../services/companies-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-company',
@@ -11,8 +13,11 @@ import { Form, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validatio
 export class NewCompany {
 
   public newCompanyForm:FormGroup;
+  public isLoading = false;
+  public isError = false;
+  public errorMessage = "";
 
-  constructor() {
+  constructor(private companiesService:CompaniesService, private router:Router) {
     this.newCompanyForm = new FormGroup({
       'name':new FormControl(null, [Validators.required, Validators.pattern('^[^\\d]+$'), Validators.minLength(2), Validators.maxLength(30)], []),
       'code':new FormControl(null, [Validators.pattern('^[0-9]+$')], []),
@@ -33,6 +38,22 @@ export class NewCompany {
 
   public submitForm() {
     const formValue = this.newCompanyForm.value;
+
+    this.isLoading = true;
+    this.isError = false;
+
+    this.companiesService.addCompany(formValue).subscribe({
+        next:() => {
+          this.isLoading = false;
+          this.router.navigate(['']);
+        },
+        error:() => {
+          this.isError = true;
+          this.isLoading = false;
+          this.errorMessage = "An error occurred when uploading data to the server.";
+        }
+      }
+    );
 
     console.group('Company Details');
     console.log('Name:', formValue.name);

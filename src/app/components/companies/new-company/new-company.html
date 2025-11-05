@@ -3,7 +3,10 @@
         Add new company
     </div>
     <div class="card-body">
-        <form [formGroup] = "newCompanyForm" (ngSubmit)="submitForm()">
+        <div *ngIf="isError" class="alert alert-danger">
+            {{ errorMessage }}
+        </div>
+        <form *ngIf="!isLoading" [formGroup] = "newCompanyForm" (ngSubmit)="submitForm()">
 
             <div class="mb-3">
                 <label for="" class="form-label">*Name</label>
@@ -130,5 +133,8 @@
                 <button type="submit" class="btn btn-success" [disabled]="!newCompanyForm.valid">Add</button>
             </div>
         </form>
+        <div *ngIf="isLoading" class="alert alert-info">
+            Loading...
+        </div>
     </div>
 </div>

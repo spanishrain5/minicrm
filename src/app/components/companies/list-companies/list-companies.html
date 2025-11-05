@@ -1,0 +1,42 @@
+<div class="card">
+    <div class="card-header">
+        Companies
+    </div>
+    <div class="card-body">
+        <div *ngIf="isError" class="alert alert-danger">
+            {{ errorMessage }}
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>PVM</th>
+                    <th>Address</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Contacts</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let c of companies; let i = index">
+                    <td>{{ i+1 }}</td>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.code }}</td>
+                    <td>{{ c.pvm }}</td>
+                    <td>{{ c.address }}</td>
+                    <td>{{ c.email }}</td>
+                    <td>{{ c.phone }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <div *ngIf="isLoading" class="alert alert-info">
+            Loading...
+        </div>
+    </div>
+</div>
+
