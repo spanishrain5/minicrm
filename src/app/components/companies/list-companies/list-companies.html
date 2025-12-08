@@ -6,6 +6,9 @@
         <div *ngIf="isError" class="alert alert-danger">
             {{ errorMessage }}
         </div>
+        <div *ngIf="companiesService.newCompanyAdded" class="alert alert-success">
+            New company added successfuly
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -18,6 +21,17 @@
                     <th>Phone</th>
                     <th>Contacts</th>
                     <th>Actions</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th><input type="text" class="form-control" [(ngModel)]="filterName" (keyup)="filterCompanies()"></th>
+                    <th><input type="text" class="form-control" [(ngModel)]="filterCode" (keyup)="filterCompanies()"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { Form, FormArray, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { AbstractControl, Form, FormArray, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { CompaniesService } from '../../../services/companies-service';
 import { Router } from '@angular/router';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-new-company',
@@ -20,7 +21,7 @@ export class NewCompany {
   constructor(private companiesService:CompaniesService, private router:Router) {
     this.newCompanyForm = new FormGroup({
       'name':new FormControl(null, [Validators.required, Validators.pattern('^[^\\d]+$'), Validators.minLength(2), Validators.maxLength(30)], []),
-      'code':new FormControl(null, [Validators.pattern('^[0-9]+$')], []),
+      'code':new FormControl(null, [Validators.pattern('^[0-9]+$')], [NewCompany.createUniqueCodeValidator(companiesService)]),
       'pvm':new FormControl(null, [Validators.pattern('^(?:LT)?\\d+$')], []),
       'address':new FormControl(null, [], []),
       'email':new FormControl(null, [Validators.required, Validators.email], []),
@@ -36,6 +37,21 @@ export class NewCompany {
     });
   }
 
+  static createUniqueCodeValidator(companiesService:CompaniesService) {
+    return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
+      return companiesService.getCompanies().pipe( 
+          map((data) => {
+            if (data.some(c => c.code == control.value)) {
+              console.log("A company with this code already exists");
+              return{ error: "A company with this code already exists" };
+            } else {
+              return null;
+            }            
+        })
+      );
+    }
+  }
+
   public submitForm() {
     const formValue = this.newCompanyForm.value;
 
@@ -46,11 +62,16 @@ export class NewCompany {
         next:() => {
           this.isLoading = false;
           this.router.navigate(['']);
+          this.toggleNewCompanyAlert(true);
+          setTimeout(() => {
+            this.toggleNewCompanyAlert(false);
+          }, 5000);
         },
         error:() => {
           this.isError = true;
+          this.toggleNewCompanyAlert(false);
           this.isLoading = false;
-          this.errorMessage = "An error occurred when uploading data to the server.";
+          this.errorMessage = "An error occurred when uploading data to the server.";         
         }
       }
     );
@@ -84,19 +105,6 @@ export class NewCompany {
     return index;
   }
 
-  // private validateNumber(c:FormControl):ValidationErrors | null {
-  //   if ( /^[0-9]+$/.test(c.value) ){
-  //     console.log(c.value);
-  //     return null;
-  //   }
-  //   else {
-  //     console.log('wrong');
-  //     return{error:"Wrong number format"};
-  //   }
-
-  //   // return{error:"Wrong number format"};
-  // }
-
   get contacts() {
     return this.newCompanyForm.get('contacts') as FormArray
   }
@@ -118,5 +126,9 @@ export class NewCompany {
 
   public removeContactField(){
     (this.newCompanyForm.get('contacts') as FormArray).removeAt(-1)
+  }
+
+  public toggleNewCompanyAlert(state:boolean) {
+    this.companiesService.newCompanyAdded = state;
   }
 }
